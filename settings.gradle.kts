@@ -2,6 +2,9 @@ rootProject.name = "smart-home-ui"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
+    plugins {
+        id("org.jetbrains.kotlin.android") version "2.3.21"
+    }
     repositories {
         google {
             mavenContent {
