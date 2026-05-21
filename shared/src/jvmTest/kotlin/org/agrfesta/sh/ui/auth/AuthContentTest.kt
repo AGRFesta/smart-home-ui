@@ -11,6 +11,31 @@ import io.kotest.matchers.shouldBe
 import kotlin.test.Test
 
 @OptIn(ExperimentalTestApi::class)
+class AuthContentTokenInvalidTest {
+
+    @Test
+    fun `should display token invalid banner when tokenInvalid is true`() = runComposeUiTest {
+        // Given
+        val tokenInvalid = true
+
+        // When
+        setContent { AuthContent(onTokenSaved = {}, tokenInvalid = tokenInvalid) }
+
+        // Then
+        onNodeWithTag("auth_token_invalid_banner").assertIsDisplayed()
+    }
+
+    @Test
+    fun `should not display token invalid banner when tokenInvalid is false`() = runComposeUiTest {
+        // When
+        setContent { AuthContent(onTokenSaved = {}, tokenInvalid = false) }
+
+        // Then
+        onNodeWithTag("auth_token_invalid_banner").assertDoesNotExist()
+    }
+}
+
+@OptIn(ExperimentalTestApi::class)
 class AuthContentTest {
 
     @Test
