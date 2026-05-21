@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.lifecycleScope
+import org.agrfesta.sh.ui.auth.AuthViewModel
 import org.agrfesta.sh.ui.navigation.PikestaApp
 import org.agrfesta.sh.ui.platform.AndroidTokenRepository
 import org.agrfesta.sh.ui.startup.StartupViewModel
@@ -17,12 +18,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val tokenRepository = AndroidTokenRepository(applicationContext)
-        val viewModel = StartupViewModel(tokenRepository, lifecycleScope)
-        viewModel.checkToken()
+        val startupViewModel = StartupViewModel(tokenRepository, lifecycleScope)
+        val authViewModel = AuthViewModel(tokenRepository, lifecycleScope)
+        startupViewModel.checkToken()
 
         setContent {
-            val uiState by viewModel.uiState.collectAsState()
-            PikestaApp(uiState = uiState)
+            val uiState by startupViewModel.uiState.collectAsState()
+            PikestaApp(uiState = uiState, authViewModel = authViewModel)
         }
     }
 }
