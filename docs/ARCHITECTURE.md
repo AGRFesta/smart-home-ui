@@ -121,7 +121,7 @@ All other collaborators (domain logic, UiState transformations, ViewModel method
 
 The following are **not yet decided** and will be documented here once resolved:
 
-- Navigation library (Compose Navigation, Decompose, or other)
+- ~~Navigation library~~ → **`org.jetbrains.androidx.navigation:navigation-compose`** (multiplatform port of Compose Navigation)
 - HTTP client library (Ktor assumed, not yet implemented)
 - Dependency injection approach (manual wiring vs. a DI framework)
 - Offline/caching strategy
