@@ -40,7 +40,7 @@ The project has three distinct test layers. Use the right one for the right scop
 
 | Level | Source set / Tool | Scope | When to use |
 |---|---|---|---|
-| **Unit** | `commonTest` — `kotlin.test` + MockK | Single class in isolation | ViewModels, domain models, mappers, pure functions |
+| **Unit** | `jvmTest` — `kotlin.test` + MockK | Single class in isolation | ViewModels, domain models, mappers, pure functions |
 | **Compose UI** | `commonTest` or `jvmTest` — `compose-ui-test` | Composable rendering and user interactions | Individual composables: correct rendering, user interaction triggers expected callback |
 | **Integration** | `jvmTest` / `androidHostTest` — `compose-ui-test` + real ViewModel | Full screen flow | Happy path of a complete screen, navigation, API client stubbed at boundary |
 
