@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 
 @Composable
-actual fun AuthContent(onTokenSaved: (String) -> Unit) {
+actual fun AuthContent(onTokenSaved: (String) -> Unit, tokenInvalid: Boolean) {
     var token by remember { mutableStateOf("") }
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -35,6 +35,13 @@ actual fun AuthContent(onTokenSaved: (String) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            if (tokenInvalid) {
+                Text(
+                    text = "Token non valido, inseriscine uno nuovo.",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.testTag("auth_token_invalid_banner")
+                )
+            }
             Text(
                 text = "Benvenuto",
                 style = MaterialTheme.typography.headlineLarge

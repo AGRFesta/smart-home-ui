@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 internal enum class CameraPermissionState { Granted, Denied, PermanentlyDenied }
 
 @Composable
-actual fun AuthContent(onTokenSaved: (String) -> Unit) {
+actual fun AuthContent(onTokenSaved: (String) -> Unit, tokenInvalid: Boolean) {
     val context = LocalContext.current
     var permissionState by remember {
         mutableStateOf(

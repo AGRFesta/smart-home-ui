@@ -8,13 +8,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import org.agrfesta.sh.ui.auth.AuthViewModel
+import org.agrfesta.sh.ui.home.HomeViewModel
 import org.agrfesta.sh.ui.startup.StartupUiState
 
 @Composable
-fun PikestaApp(uiState: StartupUiState, authViewModel: AuthViewModel) {
+fun PikestaApp(uiState: StartupUiState, authViewModel: AuthViewModel, homeViewModel: HomeViewModel) {
     when (uiState) {
-        StartupUiState.TokenPresent -> AppNavGraph(startDestination = Routes.HOME, authViewModel = authViewModel)
-        StartupUiState.TokenAbsent -> AppNavGraph(startDestination = Routes.AUTH, authViewModel = authViewModel)
+        StartupUiState.TokenPresent -> AppNavGraph(startDestination = Routes.HOME, authViewModel = authViewModel, homeViewModel = homeViewModel)
+        StartupUiState.TokenAbsent -> AppNavGraph(startDestination = Routes.AUTH, authViewModel = authViewModel, homeViewModel = homeViewModel)
         StartupUiState.Loading -> Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center

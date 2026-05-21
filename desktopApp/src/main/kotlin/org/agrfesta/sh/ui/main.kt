@@ -6,7 +6,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import kotlinx.coroutines.MainScope
+import org.agrfesta.sh.ui.api.HomeApiClient
+import org.agrfesta.sh.ui.api.HomeApiResult
 import org.agrfesta.sh.ui.auth.AuthViewModel
+import org.agrfesta.sh.ui.home.HomeViewModel
 import org.agrfesta.sh.ui.navigation.PikestaApp
 import org.agrfesta.sh.ui.platform.DesktopTokenRepository
 import org.agrfesta.sh.ui.startup.StartupViewModel
@@ -17,8 +20,15 @@ fun main() = application {
     val tokenRepository = remember {
         DesktopTokenRepository(Path.of(System.getProperty("user.home"), ".pikesta"))
     }
+    val homeApiClient = remember {
+        object : HomeApiClient {
+            override suspend fun fetchHome(token: String): HomeApiResult =
+                TODO("Implement Ktor HTTP client")
+        }
+    }
     val startupViewModel = remember { StartupViewModel(tokenRepository, scope) }
     val authViewModel = remember { AuthViewModel(tokenRepository, scope) }
+    val homeViewModel = remember { HomeViewModel(homeApiClient, tokenRepository, scope) }
     startupViewModel.checkToken()
 
     val uiState by startupViewModel.uiState.collectAsState()
@@ -27,6 +37,6 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "Pikesta",
     ) {
-        PikestaApp(uiState = uiState, authViewModel = authViewModel)
+        PikestaApp(uiState = uiState, authViewModel = authViewModel, homeViewModel = homeViewModel)
     }
 }
