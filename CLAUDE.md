@@ -6,6 +6,8 @@ Kotlin Multiplatform application targeting Android and Desktop (JVM) using Compo
 
 This project follows strict TDD. **Read `docs/TDD.md` before writing any test or production code.** It defines the mandatory Red→Green→Refactor cycle, the phase barriers, and all test writing conventions.
 
+**Read `docs/ARCHITECTURE.md` before adding new code.** It defines module boundaries, the screen anatomy (ViewModel + UiState + Composable), naming conventions, and system boundaries.
+
 ## Module Structure
 
 ```
