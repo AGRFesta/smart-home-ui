@@ -4,7 +4,10 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.v2.runComposeUiTest
+import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.agrfesta.sh.ui.api.HomeApiClient
@@ -22,8 +25,8 @@ class PikestaAppTest {
         TestScope(UnconfinedTestDispatcher())
     )
     private val homeViewModel = HomeViewModel(
-        mockk<HomeApiClient>(),
-        mockk<TokenRepository>(relaxed = true),
+        mockk<HomeApiClient>().also { coEvery { it.fetchHome(any()) } coAnswers { awaitCancellation() } },
+        mockk<TokenRepository>().also { every { it.getToken() } returns "test-token" },
         TestScope(UnconfinedTestDispatcher())
     )
 

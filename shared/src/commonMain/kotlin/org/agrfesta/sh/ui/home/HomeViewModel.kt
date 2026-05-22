@@ -25,7 +25,11 @@ class HomeViewModel(
 
     fun loadHome() {
         scope.launch {
-            val token = tokenRepository.getToken() ?: return@launch
+            val token = tokenRepository.getToken() ?: run {
+                _uiState.value = HomeUiState.Unauthorized
+                _unauthorizedEvent.emit(Unit)
+                return@launch
+            }
             try {
                 when (homeApiClient.fetchHome(token)) {
                     HomeApiResult.Success -> _uiState.value = HomeUiState.Success
