@@ -22,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,7 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal enum class CameraPermissionState { Granted, Denied, PermanentlyDenied }
@@ -91,6 +93,11 @@ private fun CameraPreviewWithQrScanner(onResult: (String) -> Unit) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     val resultDelivered = remember { AtomicBoolean(false) }
+    val backgroundExecutor = remember { Executors.newSingleThreadExecutor() }
+
+    DisposableEffect(Unit) {
+        onDispose { backgroundExecutor.shutdown() }
+    }
 
     AndroidView(
         modifier = Modifier.fillMaxSize(),
@@ -110,10 +117,10 @@ private fun CameraPreviewWithQrScanner(onResult: (String) -> Unit) {
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                     .build()
                     .also { analysis ->
-                        analysis.setAnalyzer(ContextCompat.getMainExecutor(ctx)) { imageProxy ->
+                        analysis.setAnalyzer(backgroundExecutor) { imageProxy ->
                             processQrCode(barcodeScanner, imageProxy, resultDelivered) { value ->
                                 cameraProvider.unbindAll()
-                                onResult(value)
+                                ContextCompat.getMainExecutor(ctx).execute { onResult(value) }
                             }
                         }
                     }

@@ -24,7 +24,7 @@ class StartupViewModelTest {
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = StartupViewModel(tokenRepository, testScope)
+        viewModel = StartupViewModel(tokenRepository, testScope, testDispatcher)
     }
 
     @AfterTest

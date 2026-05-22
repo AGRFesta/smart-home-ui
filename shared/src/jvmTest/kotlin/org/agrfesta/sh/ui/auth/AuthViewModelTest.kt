@@ -29,7 +29,7 @@ class AuthViewModelTest {
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = AuthViewModel(tokenRepository, testScope)
+        viewModel = AuthViewModel(tokenRepository, testScope, testDispatcher)
     }
 
     @AfterTest
