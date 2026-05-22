@@ -98,4 +98,33 @@ class AuthContentTest {
         // Then
         onNodeWithText("Permesso fotocamera negato. Abilitalo dalle impostazioni.").assertIsDisplayed()
     }
+
+    @Test
+    fun `should display settings button when camera permission is permanently denied`() = runComposeUiTest {
+        // When
+        setContent { QrAuthContent(permissionState = CameraPermissionState.PermanentlyDenied, onRequestPermission = {}, onTokenSaved = {}) }
+
+        // Then
+        onNodeWithText("Vai alle impostazioni").assertIsDisplayed()
+    }
+
+    @Test
+    fun `should call onOpenSettings when settings button is clicked`() = runComposeUiTest {
+        // Given
+        var settingsOpened = false
+        setContent {
+            QrAuthContent(
+                permissionState = CameraPermissionState.PermanentlyDenied,
+                onRequestPermission = {},
+                onTokenSaved = {},
+                onOpenSettings = { settingsOpened = true }
+            )
+        }
+
+        // When
+        onNodeWithText("Vai alle impostazioni").performClick()
+
+        // Then
+        settingsOpened shouldBe true
+    }
 }

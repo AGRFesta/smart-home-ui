@@ -2,7 +2,10 @@ package org.agrfesta.sh.ui.auth
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -70,6 +73,14 @@ actual fun AuthContent(onTokenSaved: (String) -> Unit) {
         permissionState = permissionState,
         onRequestPermission = { launcher.launch(Manifest.permission.CAMERA) },
         onTokenSaved = onTokenSaved,
+        onOpenSettings = {
+            context.startActivity(
+                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+            )
+        },
         qrScannerContent = { onResult -> CameraPreviewWithQrScanner(onResult) }
     )
 }
@@ -135,7 +146,7 @@ private fun processQrCode(
     val inputImage = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
     barcodeScanner.process(inputImage)
         .addOnSuccessListener { barcodes ->
-            barcodes.firstOrNull()?.rawValue?.let { value ->
+            barcodes.firstOrNull()?.rawValue?.trim()?.takeIf { it.isNotEmpty() }?.let { value ->
                 if (resultDelivered.compareAndSet(false, true)) {
                     onResult(value)
                 }
@@ -149,6 +160,7 @@ internal fun QrAuthContent(
     permissionState: CameraPermissionState,
     onRequestPermission: () -> Unit,
     onTokenSaved: (String) -> Unit,
+    onOpenSettings: () -> Unit = {},
     qrScannerContent: @Composable ((String) -> Unit) -> Unit = {}
 ) {
     Column(
@@ -174,9 +186,13 @@ internal fun QrAuthContent(
             ) {
                 Text("Concedi permesso fotocamera")
             }
-            CameraPermissionState.PermanentlyDenied -> Text(
-                "Permesso fotocamera negato. Abilitalo dalle impostazioni."
-            )
+            CameraPermissionState.PermanentlyDenied -> Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text("Permesso fotocamera negato. Abilitalo dalle impostazioni.")
+                Button(onClick = onOpenSettings) { Text("Vai alle impostazioni") }
+            }
         }
     }
 }

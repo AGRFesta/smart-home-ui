@@ -55,7 +55,7 @@ actual fun AuthContent(onTokenSaved: (String) -> Unit) {
                     .testTag("auth_token_field")
             )
             Button(
-                onClick = { if (token.isNotBlank()) onTokenSaved(token) },
+                onClick = { if (token.isNotBlank()) onTokenSaved(token.trim()) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("auth_save_button")

@@ -46,6 +46,20 @@ class AuthContentTest {
     }
 
     @Test
+    fun `should call onTokenSaved with trimmed token when input has surrounding whitespace`() = runComposeUiTest {
+        // Given
+        var savedToken: String? = null
+        setContent { AuthContent(onTokenSaved = { savedToken = it }) }
+
+        // When
+        onNodeWithTag("auth_token_field").performTextInput("  my-token  ")
+        onNodeWithTag("auth_save_button").performClick()
+
+        // Then
+        savedToken shouldBe "my-token"
+    }
+
+    @Test
     fun `should not call onTokenSaved when save button clicked with empty token`() = runComposeUiTest {
         // Given
         var onTokenSavedCalled = false

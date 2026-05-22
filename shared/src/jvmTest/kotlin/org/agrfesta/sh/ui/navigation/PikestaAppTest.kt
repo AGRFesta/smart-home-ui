@@ -38,4 +38,13 @@ class PikestaAppTest {
         // Then
         onNodeWithTag("auth_screen").assertIsDisplayed()
     }
+
+    @Test
+    fun `should show loading indicator when startup state is Loading`() = runComposeUiTest {
+        // When
+        setContent { PikestaApp(uiState = StartupUiState.Loading, authViewModel = authViewModel) }
+
+        // Then
+        onNodeWithTag("loading_indicator").assertIsDisplayed()
+    }
 }
