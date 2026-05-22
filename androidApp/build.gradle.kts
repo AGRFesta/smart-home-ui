@@ -16,6 +16,7 @@ dependencies {
 android {
     namespace = "org.agrfesta.sh.ui"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
+    buildFeatures { buildConfig = true }
 
     defaultConfig {
         applicationId = "org.agrfesta.sh.ui"
@@ -23,6 +24,10 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+        val url = (gradle.extra["smart_home.base_url"] as? String)
+            ?.takeIf { it.isNotBlank() }
+            ?: error("Property 'smart_home.base_url' is required in local.properties. See README.md.")
+        buildConfigField("String", "BASE_URL", "\"$url\"")
     }
     packaging {
         resources {

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.gmazzoBuildConfig)
 }
 
 dependencies {
@@ -13,6 +14,14 @@ dependencies {
     implementation(libs.kotlinx.coroutinesSwing)
 
     implementation(libs.compose.uiToolingPreview)
+}
+
+buildConfig {
+    packageName("org.agrfesta.sh.ui")
+    val url = (gradle.extra["smart_home.base_url"] as? String)
+        ?.takeIf { it.isNotBlank() }
+        ?: error("Property 'smart_home.base_url' is required in local.properties. See README.md.")
+    buildConfigField("String", "BASE_URL", "\"$url\"")
 }
 
 compose.desktop {
