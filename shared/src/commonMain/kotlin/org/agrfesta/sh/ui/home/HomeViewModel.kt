@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import org.agrfesta.sh.ui.api.HomeApiClient
 import org.agrfesta.sh.ui.api.HomeApiResult
@@ -39,6 +40,7 @@ class HomeViewModel(
                     }
                 }
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 _uiState.value = HomeUiState.Error(e.message ?: "Unknown error")
             }
         }

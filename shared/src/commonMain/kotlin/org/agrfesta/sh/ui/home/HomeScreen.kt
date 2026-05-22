@@ -37,11 +37,12 @@ internal fun HomeContent(uiState: HomeUiState) {
         contentAlignment = Alignment.Center
     ) {
         when (uiState) {
-            HomeUiState.Loading -> CircularProgressIndicator(
+            HomeUiState.Loading,
+            HomeUiState.Unauthorized -> CircularProgressIndicator(
                 modifier = Modifier.testTag("home_loading_indicator")
             )
             is HomeUiState.Error -> Text(text = uiState.message)
-            else -> Column(
+            HomeUiState.Success -> Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
