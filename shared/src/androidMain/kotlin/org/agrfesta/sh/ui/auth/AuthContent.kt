@@ -119,8 +119,10 @@ private fun CameraPreviewWithQrScanner(onResult: (String) -> Unit) {
                     .also { analysis ->
                         analysis.setAnalyzer(backgroundExecutor) { imageProxy ->
                             processQrCode(barcodeScanner, imageProxy, resultDelivered) { value ->
-                                cameraProvider.unbindAll()
-                                ContextCompat.getMainExecutor(ctx).execute { onResult(value) }
+                                ContextCompat.getMainExecutor(ctx).execute {
+                                    cameraProvider.unbindAll()
+                                    onResult(value)
+                                }
                             }
                         }
                     }
