@@ -9,6 +9,16 @@ This is a Kotlin Multiplatform project targeting Android, Desktop (JVM).
     Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./shared/src/jvmMain/kotlin)
     folder is the appropriate location.
 
+### Developer setup
+
+Before running the app, create a `local.properties` file in the project root (already git-ignored) and add:
+
+```
+smart_home.base_url=https://<your-server>
+```
+
+This value is injected at build time into `BuildConfig.BASE_URL` on both Android and Desktop.
+
 ### Running the apps
 
 Use the run configurations provided by the run widget in your IDE's toolbar. You can also use these commands and options:

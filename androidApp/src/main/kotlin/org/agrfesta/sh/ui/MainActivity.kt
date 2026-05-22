@@ -7,8 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.lifecycleScope
-import org.agrfesta.sh.ui.api.HomeApiClient
-import org.agrfesta.sh.ui.api.HomeApiResult
+import org.agrfesta.sh.ui.api.KtorHomeApiClient
 import org.agrfesta.sh.ui.auth.AuthViewModel
 import org.agrfesta.sh.ui.home.HomeViewModel
 import org.agrfesta.sh.ui.navigation.PikestaApp
@@ -21,10 +20,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val tokenRepository = AndroidTokenRepository(applicationContext)
-        val homeApiClient = object : HomeApiClient {
-            override suspend fun fetchHome(token: String): HomeApiResult =
-                throw RuntimeException("HomeApiClient not yet implemented — see follow-up issue")
-        }
+        val homeApiClient = KtorHomeApiClient(baseUrl = BuildConfig.BASE_URL)
         val startupViewModel = StartupViewModel(tokenRepository, lifecycleScope)
         val authViewModel = AuthViewModel(tokenRepository, lifecycleScope)
         val homeViewModel = HomeViewModel(homeApiClient, tokenRepository, lifecycleScope)
