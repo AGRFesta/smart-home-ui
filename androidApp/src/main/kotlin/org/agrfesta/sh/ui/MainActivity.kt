@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         val tokenRepository = AndroidTokenRepository(applicationContext)
         val homeApiClient = object : HomeApiClient {
             override suspend fun fetchHome(token: String): HomeApiResult =
-                TODO("Implement Ktor HTTP client")
+                throw RuntimeException("HomeApiClient not yet implemented — see follow-up issue")
         }
         val startupViewModel = StartupViewModel(tokenRepository, lifecycleScope)
         val authViewModel = AuthViewModel(tokenRepository, lifecycleScope)

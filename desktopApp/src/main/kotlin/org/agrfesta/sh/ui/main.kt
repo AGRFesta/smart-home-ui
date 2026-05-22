@@ -23,7 +23,7 @@ fun main() = application {
     val homeApiClient = remember {
         object : HomeApiClient {
             override suspend fun fetchHome(token: String): HomeApiResult =
-                TODO("Implement Ktor HTTP client")
+                throw RuntimeException("HomeApiClient not yet implemented — see follow-up issue")
         }
     }
     val startupViewModel = remember { StartupViewModel(tokenRepository, scope) }

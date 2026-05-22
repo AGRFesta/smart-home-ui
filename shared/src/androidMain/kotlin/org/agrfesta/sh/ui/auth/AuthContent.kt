@@ -75,6 +75,7 @@ actual fun AuthContent(onTokenSaved: (String) -> Unit, tokenInvalid: Boolean) {
         permissionState = permissionState,
         onRequestPermission = { launcher.launch(Manifest.permission.CAMERA) },
         onTokenSaved = onTokenSaved,
+        tokenInvalid = tokenInvalid,
         onOpenSettings = {
             context.startActivity(
                 Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -169,6 +170,7 @@ internal fun QrAuthContent(
     permissionState: CameraPermissionState,
     onRequestPermission: () -> Unit,
     onTokenSaved: (String) -> Unit,
+    tokenInvalid: Boolean = false,
     onOpenSettings: () -> Unit = {},
     qrScannerContent: @Composable ((String) -> Unit) -> Unit = {}
 ) {
@@ -177,6 +179,13 @@ internal fun QrAuthContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        if (tokenInvalid) {
+            Text(
+                text = "Token non valido, inseriscine uno nuovo.",
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.testTag("auth_token_invalid_banner")
+            )
+        }
         Text(
             text = "Inquadra il QR code",
             style = MaterialTheme.typography.headlineMedium
