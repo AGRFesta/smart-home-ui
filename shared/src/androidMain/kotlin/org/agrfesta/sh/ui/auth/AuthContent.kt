@@ -114,7 +114,9 @@ private fun CameraPreviewWithQrScanner(onResult: (String) -> Unit) {
                         preview,
                         imageAnalysis
                     )
-                } catch (_: Exception) { }
+                } catch (e: Exception) {
+                    android.util.Log.e("QrScanner", "Failed to bind camera", e)
+                }
             }, ContextCompat.getMainExecutor(ctx))
             previewView
         }
