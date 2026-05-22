@@ -30,6 +30,13 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.security.crypto)
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.core.ktx)
+            implementation(libs.androidx.camera.core)
+            implementation(libs.androidx.camera.camera2)
+            implementation(libs.androidx.camera.lifecycle)
+            implementation(libs.androidx.camera.view)
+            implementation(libs.mlkit.barcode.scanning)
         }
         commonMain.dependencies {
             implementation(libs.navigation.compose)
@@ -51,6 +58,11 @@ kotlin {
             implementation(libs.compose.ui.test)
             implementation(compose.desktop.currentOs)
             implementation(libs.mockk)
+        }
+        getByName("androidHostTest").dependencies {
+            implementation(libs.compose.ui.test)
+            implementation(libs.robolectric)
+            implementation(libs.androidx.testExt.junit)
         }
     }
 }
