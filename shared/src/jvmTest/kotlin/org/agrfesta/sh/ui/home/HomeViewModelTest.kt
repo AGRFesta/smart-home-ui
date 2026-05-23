@@ -48,16 +48,18 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `loadHome emits Success when client returns success`() {
+    fun `loadHome emits Success state carrying the HomeResponse returned by the API client`() {
         // Given
-        coEvery { mockApiClient.fetchHome(token) } returns HomeApiResult.Success
+        val homeResponse = aHomeResponse()
+        coEvery { mockApiClient.fetchHome(token) } returns HomeApiResult.Success(data = homeResponse)
 
         // When
         viewModel.loadHome()
         testScope.advanceUntilIdle()
 
         // Then
-        viewModel.uiState.value shouldBe HomeUiState.Success
+        val state = assertIs<HomeUiState.Success>(viewModel.uiState.value)
+        state.data shouldBe homeResponse
     }
 
     @Test
@@ -123,3 +125,4 @@ class HomeViewModelTest {
         collectJob.cancel()
     }
 }
+
