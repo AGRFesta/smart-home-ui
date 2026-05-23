@@ -135,7 +135,7 @@ Entry point (MainActivity / main.kt)
               └── TokenAbsent    → AppNavGraph starts at Routes.AUTH
 ```
 
-`collectAsState()` is called at the entry point (not inside a Composable) to avoid lifecycle/dispatcher issues.
+`collectAsState()` is called in the top-level entry-point Composable and the resolved `UiState` is passed down as a parameter, so child Composables receive plain state rather than collecting the `StateFlow` themselves.
 
 ---
 

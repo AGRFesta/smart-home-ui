@@ -32,8 +32,9 @@ class HomeViewModel(
                 return@launch
             }
             try {
-                when (homeApiClient.fetchHome(token)) {
-                    HomeApiResult.Success -> _uiState.value = HomeUiState.Success
+                val fetchResult = homeApiClient.fetchHome(token)
+                when (fetchResult) {
+                    is HomeApiResult.Success -> _uiState.value = HomeUiState.Success(data = fetchResult.data)
                     HomeApiResult.Unauthorized -> {
                         _uiState.value = HomeUiState.Unauthorized
                         _unauthorizedEvent.emit(Unit)
