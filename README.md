@@ -19,6 +19,20 @@ smart_home.base_url=https://<your-server>
 
 This value is injected at build time into `BuildConfig.BASE_URL` on both Android and Desktop.
 
+### Environment variables (CI/CD)
+
+In CI environments where `local.properties` is not available, the following environment variables can be used instead:
+
+| Variable | Description |
+|---|---|
+| `SMART_HOME_BASE_URL` | Base URL of the Smart Home backend (fallback for `smart_home.base_url`) |
+| `KEYSTORE_PATH` | Absolute path to the release `.jks` keystore file |
+| `STORE_PASSWORD` | Password for the keystore store |
+| `KEY_ALIAS` | Alias of the signing key inside the keystore |
+| `KEY_PASSWORD` | Password for the signing key |
+
+`KEYSTORE_PATH` is optional for local/debug builds. If set, all four signing variables must be provided or the build will fail explicitly.
+
 ### Running the apps
 
 Use the run configurations provided by the run widget in your IDE's toolbar. You can also use these commands and options:

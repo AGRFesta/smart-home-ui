@@ -1,7 +1,9 @@
 val localProps = java.util.Properties().apply {
     rootDir.resolve("local.properties").takeIf { it.exists() }?.inputStream()?.use(::load)
 }
-gradle.extra["smart_home.base_url"] = localProps.getProperty("smart_home.base_url") ?: ""
+gradle.extra["smart_home.base_url"] = localProps.getProperty("smart_home.base_url")
+    ?: System.getenv("SMART_HOME_BASE_URL")
+    ?: ""
 
 rootProject.name = "smart-home-ui"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
