@@ -26,6 +26,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
+import org.agrfesta.sh.ui.API_VERSION
+import org.agrfesta.sh.ui.APP_VERSION
 import org.agrfesta.sh.ui.api.Area
 import org.agrfesta.sh.ui.api.FieldResult.Failure
 import org.agrfesta.sh.ui.api.FieldResult.Success
@@ -153,30 +155,43 @@ private fun AreaCard(area: Area) {
 
 @Composable
 internal fun HomeContent(uiState: HomeUiState) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        when (uiState) {
-            HomeUiState.Loading,
-            HomeUiState.Unauthorized -> CircularProgressIndicator(
-                modifier = Modifier.testTag("home_loading_indicator")
-            )
-            is HomeUiState.Error -> Text(text = uiState.message)
-            is HomeUiState.Success -> LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 160.dp),
-                contentPadding = PaddingValues(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    GlobalStateBanner(globalState = uiState.data.globalState)
-                }
-                items(uiState.data.areas, key = { it.id }) { area ->
-                    AreaCard(area = area)
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            when (uiState) {
+                HomeUiState.Loading,
+                HomeUiState.Unauthorized -> CircularProgressIndicator(
+                    modifier = Modifier.testTag("home_loading_indicator")
+                )
+                is HomeUiState.Error -> Text(text = uiState.message)
+                is HomeUiState.Success -> LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 160.dp),
+                    contentPadding = PaddingValues(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        GlobalStateBanner(globalState = uiState.data.globalState)
+                    }
+                    items(uiState.data.areas, key = { it.id }) { area ->
+                        AreaCard(area = area)
+                    }
                 }
             }
         }
+        Text(
+            text = "smart-home v$APP_VERSION  |  API v$API_VERSION",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(bottom = 8.dp)
+                .testTag("version_footer")
+        )
     }
 }

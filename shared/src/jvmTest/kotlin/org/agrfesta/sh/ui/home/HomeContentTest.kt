@@ -368,6 +368,27 @@ class HomeContentTest {
     }
 
     @Test
+    fun `should display version footer when state is Loading`() = runComposeUiTest {
+        // When
+        setContent { HomeContent(uiState = HomeUiState.Loading) }
+
+        // Then
+        onNodeWithTag("version_footer").assertIsDisplayed()
+    }
+
+    @Test
+    fun `should display version footer when state is Success`() = runComposeUiTest {
+        // Given
+        val uiState = HomeUiState.Success(data = aHomeResponse())
+
+        // When
+        setContent { HomeContent(uiState = uiState) }
+
+        // Then
+        onNodeWithTag("version_footer").assertIsDisplayed()
+    }
+
+    @Test
     fun `should display error message when state is Error`() = runComposeUiTest {
         // Given
         val errorMessage = "Network error"
