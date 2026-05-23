@@ -117,6 +117,83 @@ All other collaborators (domain logic, UiState transformations, ViewModel method
 
 ---
 
+## Application Flows
+
+### Startup Flow
+
+```
+Entry point (MainActivity / main.kt)
+  │
+  ├── creates: TokenRepository, KtorHomeApiClient
+  ├── creates: StartupViewModel, AuthViewModel, HomeViewModel  (manual wiring, no DI framework)
+  └── calls:   startupViewModel.checkToken()
+                        │
+                        ▼
+              StartupUiState (StateFlow)
+              ├── Loading        → PikestaApp shows CircularProgressIndicator
+              ├── TokenPresent   → AppNavGraph starts at Routes.HOME
+              └── TokenAbsent    → AppNavGraph starts at Routes.AUTH
+```
+
+`collectAsState()` is called at the entry point (not inside a Composable) to avoid lifecycle/dispatcher issues.
+
+---
+
+### Auth Flow
+
+```
+AuthScreen
+  └── AuthContent (expect/actual — platform-specific)
+        ├── jvmMain:     TextField + Button  (user pastes token)
+        └── androidMain: QR scanner via CameraX + ML Kit
+
+User submits token
+  │
+  ▼
+AuthViewModel.saveToken(token)
+  ├── TokenRepository.saveToken(token)   [IO dispatcher]
+  └── emits navigationEvent (SharedFlow)
+        │
+        ▼
+AppNavGraph collects navigationEvent
+  └── navigate to Routes.HOME, popUpTo(AUTH) inclusive
+```
+
+When auth is reached after an unauthorized error, `tokenInvalid = true` is passed to `AuthScreen`
+so it can show a contextual message to the user.
+
+---
+
+### Unauthorized Redirect Flow
+
+```
+HomeViewModel.loadHome()
+  └── HomeApiClient.fetchHome(token)
+        └── HomeApiResult.Unauthorized
+              │
+              ▼
+        HomeViewModel emits unauthorizedEvent (SharedFlow)
+              │
+              ▼
+        AppNavGraph collects unauthorizedEvent
+          ├── tokenInvalid = true
+          └── navigate to Routes.AUTH, popUpTo(HOME) inclusive
+```
+
+---
+
+### Dependency Wiring (entry points)
+
+Both entry points follow the same pattern — they are the only place where concrete implementations are instantiated:
+
+| Artifact | Android | Desktop |
+|---|---|---|
+| `TokenRepository` | `AndroidTokenRepository` (EncryptedSharedPreferences) | `DesktopTokenRepository` (`~/.pikesta/token`) |
+| `HomeApiClient` | `KtorHomeApiClient(BuildConfig.BASE_URL)` | `KtorHomeApiClient(BuildConfig.BASE_URL)` |
+| `CoroutineScope` | `lifecycleScope` | `MainScope()` (via `remember`) |
+
+---
+
 ## Open Decisions
 
 The following are **not yet decided** and will be documented here once resolved:
