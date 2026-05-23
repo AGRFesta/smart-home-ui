@@ -3,6 +3,7 @@ package org.agrfesta.sh.ui
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import kotlinx.coroutines.MainScope
@@ -30,6 +31,7 @@ fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
         title = "Pikesta",
+        icon = painterResource("icon.png"),
     ) {
         PikestaApp(uiState = uiState, authViewModel = authViewModel, homeViewModel = homeViewModel)
     }
