@@ -44,7 +44,7 @@ import com.google.mlkit.vision.common.InputImage
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
-internal enum class CameraPermissionState { Granted, Denied, PermanentlyDenied }
+enum class CameraPermissionState { Granted, Denied, PermanentlyDenied }
 
 @Composable
 actual fun AuthContent(onTokenSaved: (String) -> Unit, tokenInvalid: Boolean) {
@@ -166,7 +166,7 @@ private fun processQrCode(
 }
 
 @Composable
-internal fun QrAuthContent(
+fun QrAuthContent(
     permissionState: CameraPermissionState,
     onRequestPermission: () -> Unit,
     onTokenSaved: (String) -> Unit,

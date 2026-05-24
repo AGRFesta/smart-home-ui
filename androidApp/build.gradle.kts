@@ -1,8 +1,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
-    id("org.jetbrains.kotlin.android")
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.roborazzi)
 }
 dependencies {
     implementation(projects.shared)
@@ -11,6 +11,17 @@ dependencies {
 
     implementation(libs.compose.uiToolingPreview)
     debugImplementation(libs.compose.uiTooling)
+
+    testImplementation(libs.compose.runtime)
+    testImplementation(libs.compose.ui)
+    testImplementation(libs.compose.foundation)
+    testImplementation(libs.compose.material3)
+    testImplementation(libs.compose.ui.test)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.junit)
+    testImplementation(libs.androidx.testExt.junit)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
 }
 
 android {
@@ -57,4 +68,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+}
+
+roborazzi {
+    outputDir.set(file("src/test/snapshots"))
 }

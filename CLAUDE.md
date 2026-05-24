@@ -8,6 +8,8 @@ This project follows strict TDD. **Read `docs/TDD.md` before writing any test or
 
 **Read `docs/ARCHITECTURE.md` before adding new code.** It defines module boundaries, the screen anatomy (ViewModel + UiState + Composable), naming conventions, and system boundaries.
 
+**Read `docs/SCREENSHOT_TESTING.md` before modifying Android UI composables.** It explains how to record new baselines and run screenshot verification locally.
+
 ## Module Structure
 
 ```
@@ -50,6 +52,12 @@ New features go in `shared/commonMain`. Platform-specific code only when unavoid
 
 # Run Android host tests
 ./gradlew :shared:testDebugUnitTest
+
+# Verify Android screenshot baselines
+./gradlew :androidApp:verifyRoborazziDebug
+
+# Record new screenshot baselines (after intentional UI changes)
+./gradlew :androidApp:recordRoborazziDebug
 
 # Build everything
 ./gradlew build
