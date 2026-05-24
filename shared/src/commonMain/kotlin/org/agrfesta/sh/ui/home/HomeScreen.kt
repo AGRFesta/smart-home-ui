@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -154,7 +155,7 @@ private fun AreaCard(area: Area) {
 }
 
 @Composable
-internal fun HomeContent(uiState: HomeUiState) {
+fun HomeContent(uiState: HomeUiState) {
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -190,6 +191,7 @@ internal fun HomeContent(uiState: HomeUiState) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
+                .navigationBarsPadding()
                 .padding(bottom = 8.dp)
                 .testTag("version_footer")
         )
