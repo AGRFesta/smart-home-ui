@@ -8,7 +8,7 @@ This project follows strict TDD. **Read `docs/TDD.md` before writing any test or
 
 **Read `docs/ARCHITECTURE.md` before adding new code.** It defines module boundaries, the screen anatomy (ViewModel + UiState + Composable), naming conventions, and system boundaries.
 
-**Read `docs/SCREENSHOT_TESTING.md` before modifying Android UI composables.** It explains how to record new baselines and run screenshot verification locally.
+**Read `docs/SCREENSHOT_TESTING.md` before modifying Android UI composables.** It explains how to record new baselines and verify screenshots locally (verification is local-only, not enforced on CI).
 
 ## Module Structure
 

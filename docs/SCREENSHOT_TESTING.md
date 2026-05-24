@@ -1,13 +1,17 @@
 # Screenshot Testing
 
-This project uses [Roborazzi](https://github.com/takahirom/roborazzi) for automated Android
-screenshot testing. Tests run on the JVM via Robolectric — no emulator or device required.
+This project uses [Roborazzi](https://github.com/takahirom/roborazzi) for Android screenshot
+testing. Tests run on the JVM via Robolectric — no emulator or device required.
+
+> **Note:** Screenshot verification is a local-only workflow. Baseline images are recorded and
+> verified on the developer's machine. Cross-platform rendering differences (e.g. Windows vs Linux)
+> make pixel-perfect CI comparison impractical for this project.
 
 ## How It Works
 
 1. **Record** — run the record task to generate reference PNG screenshots and commit them.
-2. **Verify** — run the verify task (or let CI run it) to compare the current render against the
-   baseline; the task fails if pixels differ beyond the threshold.
+2. **Verify** — run the verify task to compare the current render against the committed baseline;
+   the task fails if pixels differ.
 3. **Update intentionally** — when a UI change is deliberate, re-record, review the diff, and
    commit the updated baselines together with the code change.
 
@@ -33,12 +37,6 @@ androidApp/src/test/snapshots/
 
 Always commit baseline images together with the code change they correspond to.
 
-## CI
-
-`verifyRoborazziDebug` runs automatically on every push to `main` and on every pull request
-targeting `main` (see `.github/workflows/screenshot-tests.yml`). A screenshot mismatch fails
-the build.
-
 ## Covered Screens
 
 | Test class | Tests |
@@ -46,8 +44,8 @@ the build.
 | `HomeContentScreenshotTest` | `homeContent_loading`, `homeContent_error`, `homeContent_success` |
 | `AuthContentScreenshotTest` | `authContent_default`, `authContent_tokenInvalid`, `qrAuthContent` |
 
-The `HomeContent` tests in particular verify that the version footer remains visible above the
-Android system navigation bar (the `navigationBarsPadding()` inset is applied in `HomeContent`).
+The `HomeContent` tests verify in particular that the version footer remains visible above the
+Android system navigation bar (`navigationBarsPadding()` is applied in `HomeContent`).
 
 ## Updating Baselines for Intentional UI Changes
 
