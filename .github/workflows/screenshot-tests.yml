@@ -26,4 +26,13 @@ jobs:
       - name: Verify screenshot baselines
         env:
           SMART_HOME_BASE_URL: "http://localhost"
-        run: ./gradlew :androidApp:verifyRoborazziDebug
+        run: ./gradlew :androidApp:verifyRoborazziDebug --info
+
+      - name: Upload test report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roborazzi-test-report
+          path: |
+            androidApp/build/reports/tests/testDebugUnitTest/
+            androidApp/build/outputs/roborazzi/
