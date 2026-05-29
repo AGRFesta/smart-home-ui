@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -190,26 +192,34 @@ fun QrAuthContent(
             text = "Inquadra il QR code",
             style = MaterialTheme.typography.headlineMedium
         )
-        when (permissionState) {
-            CameraPermissionState.Granted -> Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .testTag("auth_qr_viewfinder")
-            ) {
-                qrScannerContent(onTokenSaved)
-            }
-            CameraPermissionState.Denied -> Button(
-                onClick = onRequestPermission,
-                modifier = Modifier.testTag("auth_request_permission_button")
-            ) {
-                Text("Concedi permesso fotocamera")
-            }
-            CameraPermissionState.PermanentlyDenied -> Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text("Permesso fotocamera negato. Abilitalo dalle impostazioni.")
-                Button(onClick = onOpenSettings) { Text("Vai alle impostazioni") }
+        Box(
+            modifier = Modifier.fillMaxWidth().weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            when (permissionState) {
+                CameraPermissionState.Granted -> Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag("auth_qr_viewfinder")
+                ) {
+                    qrScannerContent(onTokenSaved)
+                }
+                CameraPermissionState.Denied -> Button(
+                    onClick = onRequestPermission,
+                    modifier = Modifier.testTag("auth_request_permission_button")
+                ) {
+                    Text("Concedi permesso fotocamera")
+                }
+                CameraPermissionState.PermanentlyDenied -> Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Permesso fotocamera negato. Abilitalo dalle impostazioni.",
+                        textAlign = TextAlign.Center
+                    )
+                    Button(onClick = onOpenSettings) { Text("Vai alle impostazioni") }
+                }
             }
         }
     }
