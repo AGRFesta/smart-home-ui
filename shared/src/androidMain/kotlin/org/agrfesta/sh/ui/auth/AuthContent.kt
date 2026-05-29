@@ -14,11 +14,16 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +33,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,7 +49,9 @@ import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.atomic.AtomicBoolean
 
 enum class CameraPermissionState { Granted, Denied, PermanentlyDenied }
@@ -97,53 +105,130 @@ private fun CameraPreviewWithQrScanner(onResult: (String) -> Unit) {
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     val resultDelivered = remember { AtomicBoolean(false) }
     val backgroundExecutor = remember { Executors.newSingleThreadExecutor() }
-
-    DisposableEffect(Unit) {
-        onDispose { backgroundExecutor.shutdown() }
+    val isDisposed = remember { AtomicBoolean(false) }
+    val safeExecutor = remember {
+        Executor { command ->
+            if (!isDisposed.get()) {
+                try {
+                    backgroundExecutor.execute(command)
+                } catch (e: RejectedExecutionException) {
+                    // Ignora i task sottomessi durante o dopo lo shutdown
+                }
+            }
+        }
+    }
+    val currentOnResult by rememberUpdatedState(onResult)
+    val barcodeScanner = remember {
+        BarcodeScanning.getClient(
+            BarcodeScannerOptions.Builder()
+                .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+                .build()
+        )
     }
 
-    AndroidView(
-        modifier = Modifier.fillMaxSize(),
-        factory = { ctx ->
-            val previewView = PreviewView(ctx)
-            val barcodeScanner = BarcodeScanning.getClient(
-                BarcodeScannerOptions.Builder()
-                    .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
-                    .build()
-            )
-            cameraProviderFuture.addListener({
-                val cameraProvider = cameraProviderFuture.get()
-                val preview = Preview.Builder().build().also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
+    DisposableEffect(Unit) {
+        onDispose {
+            isDisposed.set(true)
+            try {
+                if (cameraProviderFuture.isDone) {
+                    cameraProviderFuture.get().unbindAll()
                 }
-                val imageAnalysis = ImageAnalysis.Builder()
-                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                    .build()
-                    .also { analysis ->
-                        analysis.setAnalyzer(backgroundExecutor) { imageProxy ->
-                            processQrCode(barcodeScanner, imageProxy, resultDelivered) { value ->
-                                ContextCompat.getMainExecutor(ctx).execute {
-                                    cameraProvider.unbindAll()
-                                    onResult(value)
+            } catch (e: Exception) {
+                android.util.Log.e("QrScanner", "Failed to unbind camera on dispose", e)
+            }
+            try {
+                barcodeScanner.close()
+            } catch (e: Exception) {
+                android.util.Log.e("QrScanner", "Failed to close barcode scanner", e)
+            }
+            backgroundExecutor.shutdown()
+        }
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { ctx ->
+                val previewView = PreviewView(ctx)
+                cameraProviderFuture.addListener({
+                    if (isDisposed.get()) return@addListener
+                    try {
+                        val cameraProvider = cameraProviderFuture.get()
+                        val preview = Preview.Builder().build().also {
+                            it.setSurfaceProvider(previewView.surfaceProvider)
+                        }
+                        val imageAnalysis = ImageAnalysis.Builder()
+                            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                            .build()
+                            .also { analysis ->
+                                analysis.setAnalyzer(safeExecutor) { imageProxy ->
+                                    if (isDisposed.get()) {
+                                        imageProxy.close()
+                                        return@setAnalyzer
+                                    }
+                                    try {
+                                        processQrCode(barcodeScanner, imageProxy, resultDelivered) { value ->
+                                            ContextCompat.getMainExecutor(ctx).execute {
+                                                if (!isDisposed.get()) {
+                                                    cameraProvider.unbindAll()
+                                                    currentOnResult(value)
+                                                }
+                                            }
+                                        }
+                                    } catch (e: Exception) {
+                                        android.util.Log.e("QrScanner", "Error processing QR code", e)
+                                        imageProxy.close()
+                                    }
                                 }
                             }
-                        }
+                        cameraProvider.unbindAll()
+                        cameraProvider.bindToLifecycle(
+                            lifecycleOwner,
+                            CameraSelector.DEFAULT_BACK_CAMERA,
+                            preview,
+                            imageAnalysis
+                        )
+                    } catch (e: Exception) {
+                        android.util.Log.e("QrScanner", "Failed to initialize or bind camera", e)
                     }
-                try {
-                    cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(
-                        lifecycleOwner,
-                        CameraSelector.DEFAULT_BACK_CAMERA,
-                        preview,
-                        imageAnalysis
-                    )
-                } catch (e: Exception) {
-                    android.util.Log.e("QrScanner", "Failed to bind camera", e)
-                }
-            }, ContextCompat.getMainExecutor(ctx))
-            previewView
+                }, ContextCompat.getMainExecutor(ctx))
+                previewView
+            }
+        )
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val strokeWidth = 4.dp.toPx()
+            val halfStroke = strokeWidth / 2
+            val viewfinderSize = minOf(size.width, size.height) * 0.8f
+            val left = (size.width - viewfinderSize) / 2
+            val top = (size.height - viewfinderSize) / 2
+            val right = left + viewfinderSize
+            val bottom = top + viewfinderSize
+
+            val overlayColor = Color.Black.copy(alpha = 0.6f)
+            drawRect(overlayColor, topLeft = Offset(0f, 0f), size = Size(size.width, top))
+            drawRect(overlayColor, topLeft = Offset(0f, bottom), size = Size(size.width, size.height - bottom))
+            drawRect(overlayColor, topLeft = Offset(0f, top), size = Size(left, viewfinderSize))
+            drawRect(overlayColor, topLeft = Offset(right, top), size = Size(size.width - right, viewfinderSize))
+
+            val cornerLength = viewfinderSize * 0.12f
+            val white = Color.White
+
+            drawLine(white, Offset(left + halfStroke, top + halfStroke), Offset(left + cornerLength, top + halfStroke), strokeWidth, StrokeCap.Square)
+            drawLine(white, Offset(left + halfStroke, top + halfStroke), Offset(left + halfStroke, top + cornerLength), strokeWidth, StrokeCap.Square)
+
+            drawLine(white, Offset(right - halfStroke, top + halfStroke), Offset(right - cornerLength, top + halfStroke), strokeWidth, StrokeCap.Square)
+            drawLine(white, Offset(right - halfStroke, top + halfStroke), Offset(right - halfStroke, top + cornerLength), strokeWidth, StrokeCap.Square)
+
+            drawLine(white, Offset(left + halfStroke, bottom - halfStroke), Offset(left + cornerLength, bottom - halfStroke), strokeWidth, StrokeCap.Square)
+            drawLine(white, Offset(left + halfStroke, bottom - halfStroke), Offset(left + halfStroke, bottom - cornerLength), strokeWidth, StrokeCap.Square)
+
+            drawLine(white, Offset(right - halfStroke, bottom - halfStroke), Offset(right - cornerLength, bottom - halfStroke), strokeWidth, StrokeCap.Square)
+            drawLine(white, Offset(right - halfStroke, bottom - halfStroke), Offset(right - halfStroke, bottom - cornerLength), strokeWidth, StrokeCap.Square)
         }
-    )
+    }
 }
 
 private fun processQrCode(
