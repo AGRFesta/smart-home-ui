@@ -20,9 +20,9 @@ import org.junit.runner.RunWith
 class AuthContentTest {
 
     @Test
-    fun `should display instructions text`() = runComposeUiTest {
+    fun `should display instructions text when camera permission is granted`() = runComposeUiTest {
         // When
-        setContent { AuthContent(onTokenSaved = {}) }
+        setContent { QrAuthContent(permissionState = CameraPermissionState.Granted, onRequestPermission = {}, onTokenSaved = {}) }
 
         // Then
         onNodeWithText("Inquadra il QR code").assertIsDisplayed()
