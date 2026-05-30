@@ -15,11 +15,14 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -273,10 +276,6 @@ fun QrAuthContent(
                 modifier = Modifier.testTag("auth_token_invalid_banner")
             )
         }
-        Text(
-            text = "Inquadra il QR code",
-            style = MaterialTheme.typography.headlineMedium
-        )
         Box(
             modifier = Modifier.fillMaxWidth().weight(1f),
             contentAlignment = Alignment.Center
@@ -288,6 +287,21 @@ fun QrAuthContent(
                         .testTag("auth_qr_viewfinder")
                 ) {
                     qrScannerContent(onTokenSaved)
+                    // Persistent label for the scanning area: overlaid on the bottom of
+                    // the viewfinder with a dark scrim so it stays legible against the
+                    // camera feed in both light and dark themes.
+                    Text(
+                        text = "Inquadra il QR code",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .fillMaxWidth()
+                            .background(Color.Black.copy(alpha = 0.6f))
+                            .navigationBarsPadding()
+                            .padding(vertical = 12.dp)
+                    )
                 }
                 CameraPermissionState.Denied -> Button(
                     onClick = onRequestPermission,
