@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,7 +40,7 @@ import org.agrfesta.sh.ui.api.GlobalState
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
     LaunchedEffect(viewModel) {
-        viewModel.loadHome()
+        viewModel.connectStream()
     }
     val uiState by viewModel.uiState.collectAsState()
     MaterialTheme {
@@ -159,6 +160,13 @@ private fun AreaCard(area: Area) {
 @Composable
 fun HomeContent(uiState: HomeUiState) {
     Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)) {
+        if (uiState is HomeUiState.Success && uiState.connectionState == ConnectionState.Reconnecting) {
+            LinearProgressIndicator(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("reconnecting_indicator")
+            )
+        }
         Box(
             modifier = Modifier
                 .weight(1f)

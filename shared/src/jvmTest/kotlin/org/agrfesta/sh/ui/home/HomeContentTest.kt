@@ -389,6 +389,36 @@ class HomeContentTest {
     }
 
     @Test
+    fun `should show reconnecting indicator when connectionState is Reconnecting`() = runComposeUiTest {
+        // Given
+        val uiState = HomeUiState.Success(
+            data = aHomeResponse(),
+            connectionState = ConnectionState.Reconnecting
+        )
+
+        // When
+        setContent { HomeContent(uiState = uiState) }
+
+        // Then
+        onNodeWithTag("reconnecting_indicator").assertIsDisplayed()
+    }
+
+    @Test
+    fun `should not show reconnecting indicator when connectionState is Connected`() = runComposeUiTest {
+        // Given
+        val uiState = HomeUiState.Success(
+            data = aHomeResponse(),
+            connectionState = ConnectionState.Connected
+        )
+
+        // When
+        setContent { HomeContent(uiState = uiState) }
+
+        // Then
+        onNodeWithTag("reconnecting_indicator").assertDoesNotExist()
+    }
+
+    @Test
     fun `should display error message when state is Error`() = runComposeUiTest {
         // Given
         val errorMessage = "Network error"

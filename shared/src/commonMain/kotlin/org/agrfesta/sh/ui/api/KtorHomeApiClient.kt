@@ -10,7 +10,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-private val lenientJson = Json { ignoreUnknownKeys = true }
+internal val lenientJson = Json { ignoreUnknownKeys = true }
 
 internal fun defaultHttpClient() = HttpClient {
     install(ContentNegotiation) {

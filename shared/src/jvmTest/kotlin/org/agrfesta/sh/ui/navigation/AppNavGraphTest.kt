@@ -4,14 +4,15 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.v2.runComposeUiTest
-import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import org.agrfesta.sh.ui.api.HomeApiClient
-import org.agrfesta.sh.ui.api.HomeApiResult
+import org.agrfesta.sh.ui.api.HomeStreamApiClient
+import org.agrfesta.sh.ui.api.HomeStreamEvent
 import org.agrfesta.sh.ui.auth.AuthViewModel
 import org.agrfesta.sh.ui.home.HomeViewModel
 import org.agrfesta.sh.ui.platform.TokenRepository
@@ -25,7 +26,7 @@ class AppNavGraphTest {
         TestScope(UnconfinedTestDispatcher())
     )
     private val homeViewModel = HomeViewModel(
-        mockk<HomeApiClient>().also { coEvery { it.fetchHome(any()) } coAnswers { awaitCancellation() } },
+        mockk<HomeStreamApiClient>().also { every { it.streamHome(any()) } returns flow { awaitCancellation() } },
         mockk<TokenRepository>().also { every { it.getToken() } returns "test-token" },
         TestScope(UnconfinedTestDispatcher())
     )
@@ -51,19 +52,17 @@ class AppNavGraphTest {
     @Test
     fun `should navigate to auth screen when home view model emits unauthorized event`() = runComposeUiTest {
         // Given
-        val unauthorizedTokenRepository = mockk<TokenRepository>()
-        every { unauthorizedTokenRepository.getToken() } returns "test-token"
-        val unauthorizedApiClient = mockk<HomeApiClient>()
-        coEvery { unauthorizedApiClient.fetchHome(any()) } returns HomeApiResult.Unauthorized
+        val unauthorizedStreamApiClient = mockk<HomeStreamApiClient>()
+        every { unauthorizedStreamApiClient.streamHome(any()) } returns flowOf(HomeStreamEvent.Unauthorized)
         val unauthorizedHomeViewModel = HomeViewModel(
-            unauthorizedApiClient,
-            unauthorizedTokenRepository,
+            unauthorizedStreamApiClient,
+            mockk<TokenRepository>().also { every { it.getToken() } returns "test-token" },
             TestScope(UnconfinedTestDispatcher())
         )
         setContent { AppNavGraph(authViewModel = authViewModel, homeViewModel = unauthorizedHomeViewModel) }
 
         // When
-        unauthorizedHomeViewModel.loadHome()
+        unauthorizedHomeViewModel.connectStream()
 
         // Then
         onNodeWithTag("auth_screen").assertIsDisplayed()
