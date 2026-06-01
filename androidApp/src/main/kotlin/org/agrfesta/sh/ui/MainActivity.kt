@@ -18,7 +18,7 @@ import org.agrfesta.sh.ui.startup.StartupViewModel
 class MainActivity : ComponentActivity() {
 
     companion object {
-        var dependencyFactory: ((Context) -> AppDependencies)? = null
+        internal var dependencyFactory: ((Context) -> AppDependencies)? = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
