@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.lifecycleScope
-import org.agrfesta.sh.ui.api.KtorHomeApiClient
+import org.agrfesta.sh.ui.api.KtorHomeStreamApiClient
 import org.agrfesta.sh.ui.auth.AuthViewModel
 import org.agrfesta.sh.ui.home.HomeViewModel
 import org.agrfesta.sh.ui.navigation.PikestaApp
@@ -20,10 +20,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val tokenRepository = AndroidTokenRepository(applicationContext)
-        val homeApiClient = KtorHomeApiClient(baseUrl = BuildConfig.BASE_URL)
+        val homeStreamApiClient = KtorHomeStreamApiClient(baseUrl = BuildConfig.BASE_URL)
         val startupViewModel = StartupViewModel(tokenRepository, lifecycleScope)
         val authViewModel = AuthViewModel(tokenRepository, lifecycleScope)
-        val homeViewModel = HomeViewModel(homeApiClient, tokenRepository, lifecycleScope)
+        val homeViewModel = HomeViewModel(homeStreamApiClient, tokenRepository, lifecycleScope)
         startupViewModel.checkToken()
 
         setContent {

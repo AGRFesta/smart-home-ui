@@ -7,7 +7,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import kotlinx.coroutines.MainScope
-import org.agrfesta.sh.ui.api.KtorHomeApiClient
+import org.agrfesta.sh.ui.api.KtorHomeStreamApiClient
 import org.agrfesta.sh.ui.auth.AuthViewModel
 import org.agrfesta.sh.ui.home.HomeViewModel
 import org.agrfesta.sh.ui.navigation.PikestaApp
@@ -20,10 +20,10 @@ fun main() = application {
     val tokenRepository = remember {
         DesktopTokenRepository(Path.of(System.getProperty("user.home"), ".pikesta"))
     }
-    val homeApiClient = remember { KtorHomeApiClient(baseUrl = BuildConfig.BASE_URL) }
+    val homeStreamApiClient = remember { KtorHomeStreamApiClient(baseUrl = BuildConfig.BASE_URL) }
     val startupViewModel = remember { StartupViewModel(tokenRepository, scope) }
     val authViewModel = remember { AuthViewModel(tokenRepository, scope) }
-    val homeViewModel = remember { HomeViewModel(homeApiClient, tokenRepository, scope) }
+    val homeViewModel = remember { HomeViewModel(homeStreamApiClient, tokenRepository, scope) }
     startupViewModel.checkToken()
 
     val uiState by startupViewModel.uiState.collectAsState()

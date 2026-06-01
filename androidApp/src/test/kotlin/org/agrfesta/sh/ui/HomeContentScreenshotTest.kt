@@ -14,6 +14,7 @@ import org.agrfesta.sh.ui.api.GlobalState
 import org.agrfesta.sh.ui.api.HeatingMeasurements
 import org.agrfesta.sh.ui.api.HomeResponse
 import org.agrfesta.sh.ui.api.HumidityMeasurements
+import org.agrfesta.sh.ui.home.ConnectionState
 import org.agrfesta.sh.ui.home.HomeContent
 import org.agrfesta.sh.ui.home.HomeUiState
 import org.junit.Test
@@ -39,6 +40,37 @@ class HomeContentScreenshotTest {
     fun homeContent_error() = runComposeUiTest {
         setContent {
             MaterialTheme { Surface { HomeContent(uiState = HomeUiState.Error("Network error")) } }
+        }
+        onRoot().captureRoboImage()
+    }
+
+    @Test
+    fun homeContent_reconnecting() = runComposeUiTest {
+        val uiState = HomeUiState.Success(
+            data = HomeResponse(
+                globalState = GlobalState(
+                    heatingActive = FieldResult.Success(true),
+                    strategy = FieldResult.Success("COMFORT")
+                ),
+                areas = listOf(
+                    Area(
+                        id = "living-room",
+                        name = "Soggiorno",
+                        measurements = AreaMeasurements(
+                            heating = HeatingMeasurements(
+                                currentTemperature = FieldResult.Success(21.5)
+                            ),
+                            humidity = HumidityMeasurements(
+                                relative = FieldResult.Success(0.55)
+                            )
+                        )
+                    )
+                )
+            ),
+            connectionState = ConnectionState.Reconnecting
+        )
+        setContent {
+            MaterialTheme { Surface { HomeContent(uiState = uiState) } }
         }
         onRoot().captureRoboImage()
     }
