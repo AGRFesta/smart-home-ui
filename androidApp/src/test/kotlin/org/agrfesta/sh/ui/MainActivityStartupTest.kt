@@ -2,7 +2,7 @@ package org.agrfesta.sh.ui
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.junit4.v2.createEmptyComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.lifecycle.Lifecycle
@@ -40,11 +40,10 @@ class MainActivityStartupTest {
             )
         }
 
-        // When
-        val scenario = ActivityScenario.launch(MainActivity::class.java)
-
-        // Then
-        scenario.state shouldBe Lifecycle.State.RESUMED
+        // When / Then
+        ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+            scenario.state shouldBe Lifecycle.State.RESUMED
+        }
     }
 
     @Test
@@ -57,15 +56,14 @@ class MainActivityStartupTest {
             )
         }
 
-        // When
-        ActivityScenario.launch(MainActivity::class.java)
-
-        // Then
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithTag("auth_request_permission_button")
-                .fetchSemanticsNodes().isNotEmpty()
+        // When / Then
+        ActivityScenario.launch(MainActivity::class.java).use {
+            composeRule.waitUntil(timeoutMillis = 5_000) {
+                composeRule.onAllNodesWithTag("auth_request_permission_button")
+                    .fetchSemanticsNodes().isNotEmpty()
+            }
+            composeRule.onNodeWithTag("auth_request_permission_button").assertIsDisplayed()
         }
-        composeRule.onNodeWithTag("auth_request_permission_button").assertIsDisplayed()
     }
 
     @Test
@@ -78,14 +76,13 @@ class MainActivityStartupTest {
             )
         }
 
-        // When
-        ActivityScenario.launch(MainActivity::class.java)
-
-        // Then
-        composeRule.waitUntil(timeoutMillis = 5_000) {
-            composeRule.onAllNodesWithTag("home_loading_indicator")
-                .fetchSemanticsNodes().isNotEmpty()
+        // When / Then
+        ActivityScenario.launch(MainActivity::class.java).use {
+            composeRule.waitUntil(timeoutMillis = 5_000) {
+                composeRule.onAllNodesWithTag("home_loading_indicator")
+                    .fetchSemanticsNodes().isNotEmpty()
+            }
+            composeRule.onNodeWithTag("home_loading_indicator").assertIsDisplayed()
         }
-        composeRule.onNodeWithTag("home_loading_indicator").assertIsDisplayed()
     }
 }
