@@ -1,5 +1,6 @@
 package org.agrfesta.sh.ui
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,15 +16,23 @@ import org.agrfesta.sh.ui.platform.AndroidTokenRepository
 import org.agrfesta.sh.ui.startup.StartupViewModel
 
 class MainActivity : ComponentActivity() {
+
+    companion object {
+        var dependencyFactory: ((Context) -> AppDependencies)? = null
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        val tokenRepository = AndroidTokenRepository(applicationContext)
-        val homeStreamApiClient = KtorHomeStreamApiClient(baseUrl = BuildConfig.BASE_URL)
-        val startupViewModel = StartupViewModel(tokenRepository, lifecycleScope)
-        val authViewModel = AuthViewModel(tokenRepository, lifecycleScope)
-        val homeViewModel = HomeViewModel(homeStreamApiClient, tokenRepository, lifecycleScope)
+        val deps = dependencyFactory?.invoke(applicationContext) ?: AppDependencies(
+            tokenRepository = AndroidTokenRepository(applicationContext),
+            homeStreamApiClient = KtorHomeStreamApiClient(baseUrl = BuildConfig.BASE_URL),
+        )
+
+        val startupViewModel = StartupViewModel(deps.tokenRepository, lifecycleScope)
+        val authViewModel = AuthViewModel(deps.tokenRepository, lifecycleScope)
+        val homeViewModel = HomeViewModel(deps.homeStreamApiClient, deps.tokenRepository, lifecycleScope)
         startupViewModel.checkToken()
 
         setContent {

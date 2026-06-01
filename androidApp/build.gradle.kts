@@ -17,11 +17,13 @@ dependencies {
     testImplementation(libs.compose.foundation)
     testImplementation(libs.compose.material3)
     testImplementation(libs.compose.ui.test)
+    testImplementation(libs.compose.ui.test.junit4)
     testImplementation(libs.robolectric)
     testImplementation(libs.junit)
     testImplementation(libs.androidx.testExt.junit)
     testImplementation(libs.roborazzi)
     testImplementation(libs.roborazzi.compose)
+    testImplementation(libs.kotest.assertions.core)
 }
 
 android {
