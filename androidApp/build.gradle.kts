@@ -35,8 +35,8 @@ android {
         applicationId = "org.agrfesta.sh.ui"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 2
-        versionName = "1.1.0"
+        versionCode = 3
+        versionName = "1.1.1"
         val url = (gradle.extra["smart_home.base_url"] as? String)
             ?.takeIf { it.isNotBlank() }
             ?: error("Property 'smart_home.base_url' is required: set it in local.properties or via the SMART_HOME_BASE_URL environment variable.")
