@@ -18,6 +18,8 @@ internal fun defaultHttpClient() = HttpClient {
     }
 }
 
+internal fun defaultStreamingHttpClient() = HttpClient()
+
 class KtorHomeApiClient(
     private val baseUrl: String,
     private val httpClient: HttpClient = defaultHttpClient(),

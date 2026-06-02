@@ -31,7 +31,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "org.agrfesta.sh.ui"
-            packageVersion = "1.1.1"
+            packageVersion = "1.1.2"
 
             linux { iconFile.set(project.file("src/main/resources/icon.png")) }
             windows { iconFile.set(project.file("src/main/resources/icon.ico")) }

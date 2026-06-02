@@ -11,11 +11,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 class KtorHomeStreamApiClient(
     private val baseUrl: String,
-    private val httpClient: HttpClient = defaultHttpClient(),
+    private val httpClient: HttpClient = defaultStreamingHttpClient(),
 ) : HomeStreamApiClient {
     override fun streamHome(token: String): Flow<HomeStreamEvent> = channelFlow {
         httpClient.prepareGet("${baseUrl.removeSuffix("/")}/home/stream") {
             header(HttpHeaders.Authorization, "Bearer $token")
+            header(HttpHeaders.Accept, "text/event-stream")
         }.execute { response ->
             when (response.status) {
                 HttpStatusCode.Unauthorized -> send(HomeStreamEvent.Unauthorized)

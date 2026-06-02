@@ -5,11 +5,9 @@ import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertFailsWith
@@ -37,6 +35,27 @@ class KtorHomeStreamApiClientTest {
 
         // Then
         capturedAuthHeader shouldBe "Bearer $token"
+    }
+
+    @Test
+    fun `streamHome sends Accept text_event-stream header`() = runTest {
+        // Given
+        var capturedAcceptHeader: String? = null
+        val mockEngine = MockEngine { request ->
+            capturedAcceptHeader = request.headers[HttpHeaders.Accept]
+            respond(
+                content = "",
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "text/event-stream")
+            )
+        }
+        val sut = testClient(mockEngine)
+
+        // When
+        sut.streamHome("any-token").collect {}
+
+        // Then
+        capturedAcceptHeader shouldBe "text/event-stream"
     }
 
     @Test
@@ -137,7 +156,5 @@ class KtorHomeStreamApiClientTest {
 
 private fun testClient(engine: MockEngine) = KtorHomeStreamApiClient(
     baseUrl = "http://test",
-    httpClient = HttpClient(engine) {
-        install(ContentNegotiation) { json() }
-    }
+    httpClient = HttpClient(engine)
 )
