@@ -91,6 +91,40 @@ class KtorHomeStreamApiClientTest {
     }
 
     @Test
+    fun `streamHome emits Data event for an area without sensors whose measurement keys are omitted`() = runTest {
+        // Given
+        val responseJson =
+            """{"globalState":{"heatingActive":{"type":"success","value":true},"strategy":{"type":"success","value":"COMFORT"}},""" +
+            """"areas":[{"id":"area-no-sensors","name":"Storage Room","measurements":{}}]}"""
+        val sseBody = "data:$responseJson\n\n"
+        val mockEngine = MockEngine { _ ->
+            respond(
+                content = sseBody,
+                status = HttpStatusCode.OK,
+                headers = headersOf(HttpHeaders.ContentType, "text/event-stream")
+            )
+        }
+        val sut = testClient(mockEngine)
+
+        // When
+        val events = mutableListOf<HomeStreamEvent>()
+        sut.streamHome("any-token").collect { events.add(it) }
+
+        // Then
+        withClue("Expected exactly one HomeStreamEvent.Data to be emitted") {
+            events.size shouldBe 1
+        }
+        val event = assertIs<HomeStreamEvent.Data>(events.first())
+        event.homeResponse.areas shouldBe listOf(
+            Area(
+                id = "area-no-sensors",
+                name = "Storage Room",
+                measurements = AreaMeasurements(heating = null, humidity = null)
+            )
+        )
+    }
+
+    @Test
     fun `streamHome emits multiple Data events for multiple consecutive SSE events`() = runTest {
         // Given
         val json1 = """{"globalState":{"heatingActive":{"type":"success","value":true},"strategy":{"type":"success","value":"COMFORT"}},"areas":[]}"""

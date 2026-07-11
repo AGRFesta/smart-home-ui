@@ -32,8 +32,8 @@ data class HumidityMeasurements(
 
 @Serializable
 data class AreaMeasurements(
-    val heating: HeatingMeasurements?,
-    val humidity: HumidityMeasurements?,
+    val heating: HeatingMeasurements? = null,
+    val humidity: HumidityMeasurements? = null,
 )
 
 @Serializable
