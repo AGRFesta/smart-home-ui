@@ -41,6 +41,8 @@ data class Area(
     val id: String,
     val name: String,
     val measurements: AreaMeasurements,
+    // Absent in older backend payloads: treated as "no alerts", not as a verified all-clear.
+    val activeAlerts: FieldResult<List<String>> = FieldResult.Success(emptyList()),
 )
 
 @Serializable

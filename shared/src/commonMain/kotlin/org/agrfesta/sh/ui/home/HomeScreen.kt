@@ -50,6 +50,15 @@ fun HomeScreen(viewModel: HomeViewModel) {
 }
 
 @Composable
+private fun FieldWarning(tag: String) {
+    Text(
+        text = "⚠",
+        modifier = Modifier.testTag(tag),
+        color = MaterialTheme.colorScheme.error
+    )
+}
+
+@Composable
 private fun GlobalStateBanner(globalState: GlobalState) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -63,11 +72,7 @@ private fun GlobalStateBanner(globalState: GlobalState) {
         ) {
             Text(text = "🔥", style = MaterialTheme.typography.bodyMedium)
             if (heatingActive is Failure) {
-                Text(
-                    text = "⚠",
-                    modifier = Modifier.testTag("heating_active_warning"),
-                    color = MaterialTheme.colorScheme.error
-                )
+                FieldWarning(tag = "heating_active_warning")
             } else {
                 Text(
                     text = if (heatingActive == Success(true)) "ATTIVO" else "INATTIVO",
@@ -84,11 +89,7 @@ private fun GlobalStateBanner(globalState: GlobalState) {
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(text = "📋", style = MaterialTheme.typography.bodyMedium)
-                Text(
-                    text = "⚠",
-                    modifier = Modifier.testTag("strategy_warning"),
-                    color = MaterialTheme.colorScheme.error
-                )
+                FieldWarning(tag = "strategy_warning")
             }
         } else if (heatingActive == Success(true) && strategy is Success && strategy.value != null) {
             Row(
@@ -113,7 +114,27 @@ private fun AreaCard(area: Area) {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            Text(text = area.name, style = MaterialTheme.typography.titleMedium)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = area.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f, fill = false)
+                )
+                when (val activeAlerts = area.activeAlerts) {
+                    is Failure -> FieldWarning(tag = "area_alerts_warning")
+                    is Success -> if (activeAlerts.value.isNotEmpty()) {
+                        val count = activeAlerts.value.size
+                        Text(
+                            text = if (count > 1) "🚨 $count" else "🚨",
+                            modifier = Modifier.testTag("area_alert_indicator"),
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            }
             area.measurements.humidity?.let { humidity ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -121,11 +142,7 @@ private fun AreaCard(area: Area) {
                 ) {
                     Text(text = "💧", style = MaterialTheme.typography.bodyMedium)
                     when (val relative = humidity.relative) {
-                        is Failure -> Text(
-                            text = "⚠",
-                            modifier = Modifier.testTag("humidity_warning"),
-                            color = MaterialTheme.colorScheme.error
-                        )
+                        is Failure -> FieldWarning(tag = "humidity_warning")
                         is Success -> Text(
                             text = if (relative.value != null) "${(relative.value * 100).roundToInt()}%" else "─",
                             style = MaterialTheme.typography.bodyMedium
@@ -140,11 +157,7 @@ private fun AreaCard(area: Area) {
                 ) {
                     Text(text = "🌡", style = MaterialTheme.typography.bodyMedium)
                     when (val currentTemperature = heating.currentTemperature) {
-                        is Failure -> Text(
-                            text = "⚠",
-                            modifier = Modifier.testTag("temperature_warning"),
-                            color = MaterialTheme.colorScheme.error
-                        )
+                        is Failure -> FieldWarning(tag = "temperature_warning")
                         is Success -> Text(
                             text = if (currentTemperature.value != null) "${currentTemperature.value}°C" else "─",
                             style = MaterialTheme.typography.bodyMedium

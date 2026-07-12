@@ -76,6 +76,46 @@ class HomeContentScreenshotTest {
     }
 
     @Test
+    fun homeContent_success_withActiveAlerts() = runComposeUiTest {
+        val measurements = AreaMeasurements(
+            heating = HeatingMeasurements(currentTemperature = FieldResult.Success(21.5)),
+            humidity = HumidityMeasurements(relative = FieldResult.Success(0.55))
+        )
+        val uiState = HomeUiState.Success(
+            data = HomeResponse(
+                globalState = GlobalState(
+                    heatingActive = FieldResult.Success(true),
+                    strategy = FieldResult.Success("COMFORT")
+                ),
+                areas = listOf(
+                    Area(
+                        id = "living-room",
+                        name = "Soggiorno",
+                        measurements = measurements,
+                        activeAlerts = FieldResult.Success(listOf("BATTERY_LOW"))
+                    ),
+                    Area(
+                        id = "kitchen",
+                        name = "Cucina",
+                        measurements = measurements,
+                        activeAlerts = FieldResult.Success(listOf("BATTERY_LOW", "UNREACHABLE"))
+                    ),
+                    Area(
+                        id = "bedroom",
+                        name = "Camera",
+                        measurements = measurements,
+                        activeAlerts = FieldResult.Failure("alert store unavailable")
+                    )
+                )
+            )
+        )
+        setContent {
+            MaterialTheme { Surface { HomeContent(uiState = uiState) } }
+        }
+        onRoot().captureRoboImage()
+    }
+
+    @Test
     fun homeContent_success() = runComposeUiTest {
         val uiState = HomeUiState.Success(
             data = HomeResponse(

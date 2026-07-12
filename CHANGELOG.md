@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Area alert indicator on the home dashboard: each area card shows a red alert icon
+  when at least one alert is active (with count when more than one), and a warning
+  glyph when the alert state cannot be retrieved (#30).
+
 ### Changed
 
 - Removed the hardcoded API version from the home screen footer; only the app version

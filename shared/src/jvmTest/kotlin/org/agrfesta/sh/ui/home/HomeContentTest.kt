@@ -347,6 +347,108 @@ class HomeContentTest {
     }
 
     @Test
+    fun `should not show alert indicator when area has no active alerts`() = runComposeUiTest {
+        // Given
+        val uiState = HomeUiState.Success(
+            data = aHomeResponse().copy(
+                areas = listOf(
+                    anArea(activeAlerts = FieldResult.Success(emptyList()))
+                )
+            )
+        )
+
+        // When
+        setContent { HomeContent(uiState = uiState) }
+
+        // Then
+        onNodeWithTag("area_alert_indicator").assertDoesNotExist()
+    }
+
+    @Test
+    fun `should show alert indicator when area has at least one active alert`() = runComposeUiTest {
+        // Given
+        val uiState = HomeUiState.Success(
+            data = aHomeResponse().copy(
+                areas = listOf(
+                    anArea(activeAlerts = FieldResult.Success(listOf("BATTERY_LOW")))
+                )
+            )
+        )
+
+        // When
+        setContent { HomeContent(uiState = uiState) }
+
+        // Then
+        onNodeWithTag("area_alert_indicator").assertIsDisplayed()
+        onNodeWithTag("area_alert_indicator").assertTextEquals("🚨")
+    }
+
+    @Test
+    fun `should keep alert indicator visible when area name is long`() = runComposeUiTest {
+        // Given
+        val uiState = HomeUiState.Success(
+            data = aHomeResponse().copy(
+                areas = listOf(
+                    anArea(
+                        name = "Nome area estremamente lungo che riempie tutta la larghezza della card",
+                        activeAlerts = FieldResult.Success(listOf("BATTERY_LOW"))
+                    )
+                )
+            )
+        )
+
+        // When
+        setContent { HomeContent(uiState = uiState) }
+
+        // Then
+        onNodeWithTag("area_alert_indicator").assertIsDisplayed()
+    }
+
+    @Test
+    fun `should show alert count next to the indicator when more than one alert is active`() = runComposeUiTest {
+        // Given
+        val uiState = HomeUiState.Success(
+            data = aHomeResponse().copy(
+                areas = listOf(
+                    anArea(activeAlerts = FieldResult.Success(listOf("BATTERY_LOW", "UNREACHABLE")))
+                )
+            )
+        )
+
+        // When
+        setContent { HomeContent(uiState = uiState) }
+
+        // Then
+        onNodeWithTag("area_alert_indicator").assertTextEquals("🚨 2")
+    }
+
+    @Test
+    fun `should show alerts warning and still render measurements when activeAlerts is Failure`() = runComposeUiTest {
+        // Given
+        val uiState = HomeUiState.Success(
+            data = aHomeResponse().copy(
+                areas = listOf(
+                    anArea(
+                        activeAlerts = FieldResult.Failure("error"),
+                        measurements = anAreaMeasurements(
+                            heating = aHeatingMeasurements(
+                                currentTemperature = FieldResult.Success(21.5)
+                            )
+                        )
+                    )
+                )
+            )
+        )
+
+        // When
+        setContent { HomeContent(uiState = uiState) }
+
+        // Then
+        onNodeWithTag("area_alerts_warning").assertIsDisplayed()
+        onNodeWithText("21.5°C").assertIsDisplayed()
+    }
+
+    @Test
     fun `should display area name`() = runComposeUiTest {
         // Given
         val uiState = HomeUiState.Success(
