@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Removed the hardcoded API version from the home screen footer; only the app version
+  is shown.
+
 ### Fixed
 
 - Dashboard crash when the home stream contains an area without sensors: omitted

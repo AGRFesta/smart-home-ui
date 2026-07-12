@@ -2,9 +2,11 @@ package org.agrfesta.sh.ui.home
 
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.v2.runComposeUiTest
+import org.agrfesta.sh.ui.APP_VERSION
 import org.agrfesta.sh.ui.api.FieldResult
 import kotlin.test.Test
 
@@ -386,6 +388,15 @@ class HomeContentTest {
 
         // Then
         onNodeWithTag("version_footer").assertIsDisplayed()
+    }
+
+    @Test
+    fun `should display only the app version in the version footer`() = runComposeUiTest {
+        // When
+        setContent { HomeContent(uiState = HomeUiState.Loading) }
+
+        // Then
+        onNodeWithTag("version_footer").assertTextEquals("smart-home v$APP_VERSION")
     }
 
     @Test

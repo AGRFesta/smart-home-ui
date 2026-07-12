@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
-import org.agrfesta.sh.ui.API_VERSION
 import org.agrfesta.sh.ui.APP_VERSION
 import org.agrfesta.sh.ui.api.Area
 import org.agrfesta.sh.ui.api.FieldResult.Failure
@@ -196,7 +195,7 @@ fun HomeContent(uiState: HomeUiState) {
             }
         }
         Text(
-            text = "smart-home v$APP_VERSION  |  API v$API_VERSION",
+            text = "smart-home v$APP_VERSION",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
