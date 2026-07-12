@@ -48,17 +48,20 @@ def fetch_and_filter_pr_comments():
         pr_data = json.loads(pr_result.stdout)
         pr_number = pr_data.get("number")
 
-        # 2. Fetch the actual inline code comments using GitHub REST API
+        # 2. Fetch the actual inline code comments using GitHub REST API.
+        # --paginate alone concatenates the pages' JSON arrays ([...][...]),
+        # which json.loads rejects; --slurp wraps them into an array of arrays.
         api_endpoint = f"repos/:owner/:repo/pulls/{pr_number}/comments"
         # FIXED: Added encoding="utf-8" here as well
         inline_result = subprocess.run(
-            ["gh", "api", api_endpoint],
+            ["gh", "api", api_endpoint, "--paginate", "--slurp"],
             capture_output=True,
             text=True,
             check=True,
             encoding="utf-8"
         )
-        inline_comments = json.loads(inline_result.stdout)
+        pages = json.loads(inline_result.stdout)
+        inline_comments = [item for page in pages for item in page]
 
         pr_context = {
             "pr_title": pr_data.get("title"),
@@ -101,6 +104,8 @@ def fetch_and_filter_pr_comments():
             if not is_noise_bot(author) and body:
                 pr_context["comments_to_analyze"].append({
                     "type": "inline_code_comment",
+                    "id": comment.get("id"),
+                    "in_reply_to_id": comment.get("in_reply_to_id"),
                     "author": author,
                     "file": file_path,
                     "line": line,
