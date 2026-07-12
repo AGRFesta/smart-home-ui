@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- App header with the application name logo shown on authenticated views, starting
+  with the home dashboard (#35).
 - Area alert indicator on the home dashboard: each area card shows a red alert icon
   when at least one alert is active (with count when more than one), and a warning
   glyph when the alert state cannot be retrieved (#30).
