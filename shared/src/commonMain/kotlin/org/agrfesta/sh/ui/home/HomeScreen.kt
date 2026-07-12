@@ -35,6 +35,7 @@ import org.agrfesta.sh.ui.api.Area
 import org.agrfesta.sh.ui.api.FieldResult.Failure
 import org.agrfesta.sh.ui.api.FieldResult.Success
 import org.agrfesta.sh.ui.api.GlobalState
+import org.agrfesta.sh.ui.components.AppHeader
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
@@ -172,6 +173,7 @@ private fun AreaCard(area: Area) {
 @Composable
 fun HomeContent(uiState: HomeUiState) {
     Column(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)) {
+        AppHeader()
         if (uiState is HomeUiState.Success && uiState.connectionState == ConnectionState.Reconnecting) {
             LinearProgressIndicator(
                 modifier = Modifier

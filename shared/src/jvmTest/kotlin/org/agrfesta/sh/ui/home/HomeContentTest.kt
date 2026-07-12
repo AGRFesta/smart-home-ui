@@ -463,6 +463,27 @@ class HomeContentTest {
     }
 
     @Test
+    fun `should display app header when state is Loading`() = runComposeUiTest {
+        // When
+        setContent { HomeContent(uiState = HomeUiState.Loading) }
+
+        // Then
+        onNodeWithTag("app_header_logo").assertIsDisplayed()
+    }
+
+    @Test
+    fun `should display app header when state is Success`() = runComposeUiTest {
+        // Given
+        val uiState = HomeUiState.Success(data = aHomeResponse())
+
+        // When
+        setContent { HomeContent(uiState = uiState) }
+
+        // Then
+        onNodeWithTag("app_header_logo").assertIsDisplayed()
+    }
+
+    @Test
     fun `should display loading indicator when state is Loading`() = runComposeUiTest {
         // When
         setContent { HomeContent(uiState = HomeUiState.Loading) }

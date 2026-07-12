@@ -32,6 +32,7 @@ org.agrfesta.sh.ui
 │   ├── <Feature>ViewModel.kt    — state holder, event handler
 │   └── <Feature>UiState.kt      — sealed class for this screen's state
 ├── api/                API client interfaces + request/response models
+├── components/         reusable cross-feature composables (e.g., AppHeader)
 ├── navigation/         nav graph definition and route constants
 └── theme/              MaterialTheme setup, colors, typography
 ```
