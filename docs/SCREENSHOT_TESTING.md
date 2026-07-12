@@ -37,11 +37,17 @@ androidApp/src/test/snapshots/
 
 Always commit baseline images together with the code change they correspond to.
 
+## Test Structure
+
+Screenshot tests are exempt from the `// Given / // When / // Then` structure mandated by
+`docs/TDD.md`: they consist of state setup plus a single `captureRoboImage()` call, and the
+assertion lives in the baseline comparison rather than in the test body.
+
 ## Covered Screens
 
 | Test class | Tests |
 |---|---|
-| `HomeContentScreenshotTest` | `homeContent_loading`, `homeContent_error`, `homeContent_success` |
+| `HomeContentScreenshotTest` | `homeContent_loading`, `homeContent_error`, `homeContent_reconnecting`, `homeContent_success`, `homeContent_success_withActiveAlerts` |
 | `AuthContentScreenshotTest` | `authContent_default`, `authContent_tokenInvalid`, `qrAuthContent` |
 
 The `HomeContent` tests verify in particular that the version footer remains visible above the

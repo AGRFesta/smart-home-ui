@@ -22,7 +22,8 @@ fun anArea(
     id: String = "test-area-id",
     name: String = "Test Area",
     measurements: AreaMeasurements = anAreaMeasurements(),
-) = Area(id = id, name = name, measurements = measurements)
+    activeAlerts: FieldResult<List<String>> = FieldResult.Success(emptyList()),
+) = Area(id = id, name = name, measurements = measurements, activeAlerts = activeAlerts)
 
 fun anAreaMeasurements(
     heating: HeatingMeasurements? = aHeatingMeasurements(),

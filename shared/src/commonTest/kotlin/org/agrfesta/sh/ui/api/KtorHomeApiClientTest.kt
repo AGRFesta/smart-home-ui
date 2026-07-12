@@ -61,6 +61,66 @@ class KtorHomeApiClientTest {
     }
 
     @Test
+    fun `fetchHome maps area without activeAlerts field to Success with empty list`() = runTest {
+        // Given
+        val responseBody = homeResponseBody(activeAlertsJson = null)
+        val sut = testClient(jsonResponseEngine(responseBody))
+
+        // When
+        val result = sut.fetchHome("any-token")
+
+        // Then
+        val success = assertIs<HomeApiResult.Success>(result)
+        success.data.areas.first().activeAlerts shouldBe FieldResult.Success(emptyList<String>())
+    }
+
+    @Test
+    fun `fetchHome maps activeAlerts success with empty array to Success with empty list`() = runTest {
+        // Given
+        val responseBody = homeResponseBody(activeAlertsJson = """{ "type": "success", "value": [] }""")
+        val sut = testClient(jsonResponseEngine(responseBody))
+
+        // When
+        val result = sut.fetchHome("any-token")
+
+        // Then
+        val success = assertIs<HomeApiResult.Success>(result)
+        success.data.areas.first().activeAlerts shouldBe FieldResult.Success(emptyList<String>())
+    }
+
+    @Test
+    fun `fetchHome maps activeAlerts success with non-empty array to Success with alert types`() = runTest {
+        // Given
+        val responseBody = homeResponseBody(
+            activeAlertsJson = """{ "type": "success", "value": ["BATTERY_LOW", "UNREACHABLE"] }"""
+        )
+        val sut = testClient(jsonResponseEngine(responseBody))
+
+        // When
+        val result = sut.fetchHome("any-token")
+
+        // Then
+        val success = assertIs<HomeApiResult.Success>(result)
+        success.data.areas.first().activeAlerts shouldBe FieldResult.Success(listOf("BATTERY_LOW", "UNREACHABLE"))
+    }
+
+    @Test
+    fun `fetchHome maps activeAlerts failure to Failure with error reason`() = runTest {
+        // Given
+        val responseBody = homeResponseBody(
+            activeAlertsJson = """{ "type": "failure", "error": "alert store unavailable" }"""
+        )
+        val sut = testClient(jsonResponseEngine(responseBody))
+
+        // When
+        val result = sut.fetchHome("any-token")
+
+        // Then
+        val success = assertIs<HomeApiResult.Success>(result)
+        success.data.areas.first().activeAlerts shouldBe FieldResult.Failure("alert store unavailable")
+    }
+
+    @Test
     fun `fetchHome returns Success carrying the parsed HomeResponse when server responds with 200`() = runTest {
         // Given
         val responseBody = """
@@ -85,14 +145,7 @@ class KtorHomeApiClientTest {
               ]
             }
         """.trimIndent()
-        val mockEngine = MockEngine {
-            respond(
-                content = responseBody,
-                status = HttpStatusCode.OK,
-                headers = headersOf(HttpHeaders.ContentType, "application/json")
-            )
-        }
-        val sut = testClient(mockEngine)
+        val sut = testClient(jsonResponseEngine(responseBody))
 
         // When
         val result = sut.fetchHome("any-token")
@@ -120,6 +173,33 @@ class KtorHomeApiClientTest {
             )
         )
     }
+}
+
+private fun homeResponseBody(activeAlertsJson: String? = null): String {
+    val activeAlertsLine = activeAlertsJson?.let { """, "activeAlerts": $it""" } ?: ""
+    return """
+        {
+          "globalState": {
+            "heatingActive": { "type": "success", "value": true },
+            "strategy":      { "type": "success", "value": "COMFORT" }
+          },
+          "areas": [
+            {
+              "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+              "name": "Living Room",
+              "measurements": {}$activeAlertsLine
+            }
+          ]
+        }
+    """.trimIndent()
+}
+
+private fun jsonResponseEngine(body: String) = MockEngine {
+    respond(
+        content = body,
+        status = HttpStatusCode.OK,
+        headers = headersOf(HttpHeaders.ContentType, "application/json")
+    )
 }
 
 private fun testClient(engine: MockEngine) = KtorHomeApiClient(
