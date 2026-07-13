@@ -10,6 +10,8 @@ This project follows strict TDD. **Read `docs/TDD.md` before writing any test or
 
 **Read `docs/SCREENSHOT_TESTING.md` before modifying Android UI composables.** It explains how to record new baselines and verify screenshots locally (verification is local-only, not enforced on CI).
 
+**Read `docs/RELEASE.md` before preparing a release.** It lists every file holding the version, the changelog steps, and how the release pipeline is triggered.
+
 **Update `CHANGELOG.md` with every user-facing change.** Add an entry under the `[Unreleased]` section ([Keep a Changelog](https://keepachangelog.com) format: `Added`/`Changed`/`Fixed`). When bumping the version, rename `[Unreleased]` to the new version with the release date and update the compare links at the bottom.
 
 ## Module Structure
