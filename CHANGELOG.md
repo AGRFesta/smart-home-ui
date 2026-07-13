@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-13
+
 ### Added
 
 - App header with the application name logo shown on authenticated views, starting
@@ -25,6 +27,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Themed (monochrome) launcher icon on Android 13+: the adaptive icon `<monochrome>`
   layer now references a dedicated vector drawable of the mascot silhouette instead of
   a WebP bitmap, which the system silently ignored (#31).
+
+## [1.1.2] - 2026-06-02
+
+### Fixed
+
 - Dashboard crash when the home stream contains an area without sensors: omitted
   `heating`/`humidity` measurement keys no longer fail deserialization, leaving the
   screen stuck in Error or in an endless Reconnecting loop.
@@ -75,3 +82,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Authentication flow: QR scan on mobile, token paste form on desktop.
 - App version and API version shown in the home screen footer (#8).
 - Android release pipeline via GitHub Actions (#10).
+
+[unreleased]: https://github.com/AGRFesta/smart-home-ui/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/AGRFesta/smart-home-ui/compare/v1.1.2...v1.2.0
+[1.1.2]: https://github.com/AGRFesta/smart-home-ui/compare/v1.1.1...v1.1.2
+[1.1.1]: https://github.com/AGRFesta/smart-home-ui/compare/v1.1.0...v1.1.1
+[1.1.0]: https://github.com/AGRFesta/smart-home-ui/compare/v1.0.2...v1.1.0
+[1.0.2]: https://github.com/AGRFesta/smart-home-ui/compare/v1.0.1...v1.0.2
+[1.0.1]: https://github.com/AGRFesta/smart-home-ui/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/AGRFesta/smart-home-ui/releases/tag/v1.0.0
