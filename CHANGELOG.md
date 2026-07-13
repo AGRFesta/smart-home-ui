@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Themed (monochrome) launcher icon on Android 13+: the adaptive icon `<monochrome>`
+  layer now references a dedicated vector drawable of the mascot silhouette instead of
+  a WebP bitmap, which the system silently ignored (#31).
 - Dashboard crash when the home stream contains an area without sensors: omitted
   `heating`/`humidity` measurement keys no longer fail deserialization, leaving the
   screen stuck in Error or in an endless Reconnecting loop.
